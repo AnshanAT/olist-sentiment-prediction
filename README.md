@@ -18,7 +18,7 @@ https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce/data
 To address the research question, we propose to design structured behavioural features that capture latent customer states, rather than relying on raw variables.
 1.	A frustration index, defined as the normalized difference between estimated and actual delivery time, along with freight-to-price ratios
 2.	A financial burden index, based on the relationship between total payment value and the number of installments
-3.	A consistency index, capturing variability in customer purchasing behaviour, such as product category diversity and price dispersion
+3.	A consistency index, capturing variabili    ty in customer purchasing behaviour, such as product category diversity and price dispersion
 
 # Experimental Design
 We will compare three models with different levels of complexity
