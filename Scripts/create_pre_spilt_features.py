@@ -1,9 +1,10 @@
 import pandas as pd
 import numpy as np
 
-# ==========================================
+# Converted from Notebook to Script form
+
 # 1. joining_notebook.ipynb
-# ==========================================
+
 # Load all raw datasets
 customers = pd.read_csv('./Data/olist_customers_dataset.csv')
 orders = pd.read_csv('./Data/olist_orders_dataset.csv')
@@ -37,10 +38,8 @@ df['seller_zip_int'] = pd.to_numeric(df['seller_zip_code_prefix'], errors='coerc
 df = df.merge(geo_centroids.rename(columns={'geolocation_zip_code_prefix': 'seller_zip_int', 'geolocation_lat': 'seller_lat', 'geolocation_lng': 'seller_lng'}), on='seller_zip_int', how='left')
 df.drop(columns='seller_zip_int', inplace=True)
 
-
-# ==========================================
 # 2. cleaning_dataset.ipynb
-# ==========================================
+
 master_df = df
 
 # lenght -> length
@@ -51,7 +50,10 @@ master_df = master_df.drop(columns=['product_description_lenght', 'product_name_
 # Convert date columns to datetime objects
 date_time_cols = ['order_purchase_timestamp', 'order_approved_at', 'order_delivered_carrier_date', 'order_delivered_customer_date', 'order_estimated_delivery_date', 'shipping_limit_date', 'review_creation_date', 'review_answer_timestamp']
 for col in date_time_cols:
-    master_df[col] = pd.to_datetime(master_df[col], errors='coerce')
+    master_df[col] = pd.to_datetime(master_df[col], format='mixed')
+
+# no review creation date, no info...
+master_df = master_df.dropna(subset=['review_creation_date'])
 
 # Filter rows based on notebook criteria
 master_df = master_df[master_df['review_score'].notna()].copy()
@@ -79,11 +81,19 @@ for col in dim_cols:
     master_df[col] = master_df.groupby('product_category_name_english')[col].transform(lambda x: x.fillna(x.mean()))
 
 meta_cols = ['product_name_length', 'product_desc_length', 'product_photos_qty']
+
 for col in meta_cols:
     master_df[col] = master_df.groupby('product_category_name_english')[col].transform(lambda x: x.fillna(x.mean()))
 
 # Match notebook's exact row duplicate dropping state
 master_df = master_df.drop_duplicates()
+
+payment_dummies = pd.get_dummies(
+    master_df[['order_id', 'payment_type']],
+    columns=['payment_type'],
+    prefix='paid'
+)
+payment_dummies = payment_dummies.groupby('order_id').max().reset_index()
 
 # Aggregate item data to order-level (Moved up to align with notebook aggregation state)
 agg_dict = {
@@ -140,10 +150,6 @@ master_df_agg = master_df_agg.rename(columns={
     'payment_sequential': 'num_payment_methods'
 })
 
-# Create one-hot encoded payment indicators (Moved down to follow notebook execution sequence)
-payment_dummies = pd.get_dummies(master_df[['order_id', 'payment_type']], columns=['payment_type'], prefix='paid')
-payment_dummies = payment_dummies.groupby('order_id').max().reset_index()
-
 # Merge payment indicators back into the aggregated dataframe
 master_df = master_df_agg.merge(payment_dummies, on='order_id', how='left')
 
@@ -157,16 +163,15 @@ for col in nominal_cols:
     master_df[col] = master_df[col].astype('category')
 
 # Standardize review score structure
-# master_df['review_score'] = pd.Categorical(master_df['review_score'], categories=[1, 2, 3, 4, 5], ordered=True)
+master_df['review_score'] = pd.Categorical(master_df['review_score'], categories=[1, 2, 3, 4, 5], ordered=True)
 
 # Drop redundant raw IDs
 master_df = master_df.drop(columns=['customer_id', 'product_id', 'review_id'])
 
-
-# ==========================================
 # 3. feature_creation_v3.ipynb (Pre-split)
-# ==========================================
 df = master_df
+
+df['review_score'] = df['review_score'].astype(int)
 
 # Cast target variable to int and drop raw review texts
 # df['review_score'] = df['review_score'].astype(int)
@@ -230,7 +235,7 @@ df['total_listing_length'] = df[name_col].fillna(0) + df[desc_col].fillna(0)
 df['product_volume_cm3'] = df['product_length_cm'] * df['product_height_cm'] * df['product_width_cm']
 # Density: heavy-for-size → expensive to ship, affects carrier handling
 df['weight_to_volume_ratio'] = np.where(df['product_volume_cm3'] > 0, df['product_weight_g'] / df['product_volume_cm3'], np.nan)
-# Listing effort: many photos relative to description length
+
 df['photos_per_desc_char'] = np.where(df[desc_col].fillna(0) > 0, df['product_photos_qty'].fillna(0) / df[desc_col].clip(lower=1), np.nan)
 df['is_heavy_product'] = (df['product_weight_g'] > 5_000).astype(int)
 df['is_bulky_product'] = (df['product_volume_cm3'] > 40_000).astype(int)
