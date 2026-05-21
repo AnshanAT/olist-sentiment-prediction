@@ -60,34 +60,34 @@ else:
 
 
 
-# ### Review 9088 case in detail
-# # Get the exact order_id for row 9088
-# idx_9088 = 9088
-# order_id_9088 = notebook.loc[idx_9088, 'order_id']
-# print("=== Target Order ID ===")
-# print(f"Index 9088 Order ID: {order_id_9088}\n")
+### Review 9088 case in detail
+# Get the exact order_id for row 9088
+idx_9088 = 9088
+order_id_9088 = notebook.loc[idx_9088, 'order_id']
+print("=== Target Order ID ===")
+print(f"Index 9088 Order ID: {order_id_9088}\n")
 
-# # Extract operational date columns for this order
-# date_cols = [
-#     'order_purchase_timestamp', 
-#     'order_delivered_customer_date', 
-#     'review_creation_date'
-# ]
+# Extract operational date columns for this order
+date_cols = [
+    'order_purchase_timestamp', 
+    'order_delivered_customer_date', 
+    'review_creation_date'
+]
 
-# print("=== Date Values Comparison ===")
-# for col in date_cols:
-#     print(f"{col:<32} -> Notebook: {notebook.loc[idx_9088, col]}, Script: {script.loc[idx_9088, col]}")
+print("=== Date Values Comparison ===")
+for col in date_cols:
+    print(f"{col:<32} -> Notebook: {notebook.loc[idx_9088, col]}, Script: {script.loc[idx_9088, col]}")
 
 
 
-# ### Check raw review data for this specific order_id for 9088
-# try:
-#     raw_reviews = pd.read_csv('./Data/olist_order_reviews_dataset.csv')
-#     mismatched_review = raw_reviews[raw_reviews['order_id'] == '186c43c492d0813457a0da8ee78ef748']
+### Check raw review data for this specific order_id for 9088
+try:
+    raw_reviews = pd.read_csv('./Data/olist_order_reviews_dataset.csv')
+    mismatched_review = raw_reviews[raw_reviews['order_id'] == '186c43c492d0813457a0da8ee78ef748']
     
-#     print("=== Raw Reviews Table State ===")
-#     print(mismatched_review[['order_id', 'review_id', 'review_score', 'review_creation_date']])
-# except Exception as e:
-#     print(f"Error: {e}")
+    print("=== Raw Reviews Table State ===")
+    print(mismatched_review[['order_id', 'review_id', 'review_score', 'review_creation_date']])
+except Exception as e:
+    print(f"Error: {e}")
 
 

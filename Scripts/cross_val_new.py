@@ -16,24 +16,20 @@ class StratifiedKFold:
         if self.shuffle:
             rng.shuffle(indices)
 
+        # group indices by class label
         by_class = defaultdict(list)
         for i in indices:
             by_class[int(y[i])].append(i)
 
+        # round-robin assign each class's samples to folds
         buckets = [[] for _ in range(self.n_splits)]
-
         for class_indices in by_class.values():
             for pos, idx in enumerate(class_indices):
                 buckets[pos % self.n_splits].append(idx)
 
         for k in range(self.n_splits):
             val = np.array(buckets[k])
-            train = np.array([
-                i
-                for j, b in enumerate(buckets)
-                for i in b
-                if j != k
-            ])
+            train = np.array([i for j, b in enumerate(buckets) for i in b if j != k])
             yield train, val
 
 
