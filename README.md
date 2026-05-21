@@ -1,4 +1,4 @@
-# olist-sentiment-predictiom
+# olist-sentiment-prediction
 Repository for COMP90051 Project, Group 55
 
 
