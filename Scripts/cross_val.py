@@ -90,14 +90,14 @@ class NestedCV:
         return best_params
 
     def _score(self, y_true, y_pred, model, X_val):
-        from Scripts.metrics import f1_macro, accuracy, roc_auc
+        from Scripts.metrics import f1_macro, accuracy#, roc_auc
 
         if self.scoring == 'f1_macro':
             return f1_macro(y_true, y_pred)
         elif self.scoring == 'accuracy':
             return accuracy(y_true, y_pred)
-        elif self.scoring == 'auc':
-            return roc_auc(y_true, model.predict_proba(X_val))
+        # elif self.scoring == 'auc':
+        #     return roc_auc(y_true, model.predict_proba(X_val))
         else:
             raise ValueError(f"Unknown scoring: {self.scoring}")
 
@@ -111,7 +111,8 @@ def cross_validate(model_class, X, y, param_grid, n_outer=10, n_inner=3,
 
     fold_metrics = []
     best_params = []
-    y_true_all, y_pred_all, y_proba_all = [], [], []
+    # y_true_all, y_pred_all, y_proba_all = [], [], []
+    y_true_all, y_pred_all = [], []
 
     for fold, (train_idx, test_idx) in enumerate(outer_cv.split(X, y), 1):
         X_train, X_test = X[train_idx], X[test_idx]
@@ -125,19 +126,23 @@ def cross_validate(model_class, X, y, param_grid, n_outer=10, n_inner=3,
         model.fit(X_train, y_train)
 
         y_pred = model.predict(X_test)
-        y_proba = model.predict_proba(X_test) if hasattr(model, 'predict_proba') else None
+        # y_proba = model.predict_proba(X_test) if hasattr(model, 'predict_proba') else None
 
-        metrics = compute_all_metrics(y_test, y_pred, y_proba)
+        # metrics = compute_all_metrics(y_test, y_pred, y_proba)
+        metrics = compute_all_metrics(y_test, y_pred)
         fold_metrics.append(metrics)
 
         y_true_all.extend(y_test.tolist())
         y_pred_all.extend(y_pred.tolist())
-        if y_proba is not None:
-            y_proba_all.extend(y_proba.tolist())
+        # if y_proba is not None:
+            # y_proba_all.extend(y_proba.tolist())
 
         if verbose:
-            print(f"fold {fold}/{n_outer}  f1={metrics.get('f1_macro', float('nan')):.4f}  "
-                  f"auc={metrics.get('auc', float('nan')):.4f}  params={params}")
+            # print(f"fold {fold}/{n_outer}  f1={metrics.get('f1_macro', float('nan')):.4f}  "
+            #       f"auc={metrics.get('auc', float('nan')):.4f}  params={params}")
+            print(f"fold {fold}/{n_outer} "f"{scoring}={metrics.get(scoring,float('nan')):.4f} "
+                  f"params={params}")
+
 
     keys = fold_metrics[0].keys()
     mean_metrics = {k: float(np.mean([m[k] for m in fold_metrics])) for k in keys}
@@ -153,7 +158,7 @@ def cross_validate(model_class, X, y, param_grid, n_outer=10, n_inner=3,
         'best_params':  best_params,
         'y_true_all':   np.array(y_true_all),
         'y_pred_all':   np.array(y_pred_all),
-        'y_proba_all':  np.array(y_proba_all) if y_proba_all else None,
+        # 'y_proba_all':  np.array(y_proba_all) if y_proba_all else None,
         'mean_metrics': mean_metrics,
         'std_metrics':  std_metrics,
     }
@@ -182,11 +187,11 @@ if __name__ == '__main__':
     stub = types.ModuleType('Scripts.metrics')
     stub.f1_macro = lambda yt, yp: float(np.mean(yt == yp))
     stub.accuracy = lambda yt, yp: float(np.mean(yt == yp))
-    stub.roc_auc  = lambda yt, yp: 0.5
-    stub.compute_all_metrics = lambda yt, yp, ypr: {
+    # stub.roc_auc  = lambda yt, yp: 0.5
+    stub.compute_all_metrics = lambda yt, yp, ypr=None: {
         'f1_macro': float(np.mean(yt == yp)),
         'accuracy': float(np.mean(yt == yp)),
-        'auc': 0.5,
+        # 'auc': 0.5,
     }
     sys.modules.setdefault('Scripts', types.ModuleType('Scripts'))
     sys.modules['Scripts.metrics'] = stub
