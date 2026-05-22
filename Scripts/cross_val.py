@@ -24,7 +24,7 @@ def evaluate_inner_fold(model_class, params, train_df, val_df, scoring):
     X_train, y_train, _ = prepare_X_y(train_fe, TARGET_COL)
     X_val, y_val, _ = prepare_X_y(val_fe, TARGET_COL)
 
-    # X_train, X_val = standardize_features(X_train, X_val)
+    X_train, X_val = standardize_features(X_train, X_val)
 
     model = model_class(**params)
     model.fit(X_train, y_train)
@@ -74,7 +74,7 @@ def evaluate_outer_fold(model_class, params, train_df, test_df):
     X_train, y_train, feature_names = prepare_X_y(train_fe, TARGET_COL)
     X_test, y_test, _ = prepare_X_y(test_fe, TARGET_COL)
 
-    # X_train, X_test = standardize_features(X_train, X_test)
+    X_train, X_test = standardize_features(X_train, X_test)
 
     model = model_class(**params)
     model.fit(X_train, y_train)
