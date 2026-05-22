@@ -32,7 +32,7 @@ DROP_COLS = [
     "photo_qty",
 ]
 
-def prepare_X_y(df, target_col):
+def prepare_X_y(df, target_col, median_giv=None):
     data = df.copy()
 
     y = data[target_col].astype(int).values
@@ -52,16 +52,29 @@ def prepare_X_y(df, target_col):
 
     # Convert infinite values to NaN before
     data = data.replace([np.inf, -np.inf], np.nan)
+    
+    # median not given so gotta calculate the means 
+    to_fit = False
+    if median_giv is None: to_fit = True
 
+    if to_fit:
+        median_giv = {}
+
+        # Just calculate for all cus key errors later...
+        for col in data.columns:
+            median_giv[col] = data[col].median()
+    
     # Median-impute remaining NaNs
     for col in data.columns:
         if data[col].isna().any():
-            data[col] = data[col].fillna(data[col].median())
+            data[col] = data[col].fillna(median_giv[col])
 
     X = data.values.astype(np.float64)
     feature_names = data.columns.tolist()
 
-    return X, y, feature_names
+    return X, y, feature_names, median_giv
+
+
 
 def standardize_features(X_train, X_test):
     # z-score normalization based on training set stats only (to avoid data leakage)

@@ -76,14 +76,21 @@ master_df = master_df.dropna(subset=['order_approved_at', 'order_delivered_carri
 master_df = master_df.dropna(subset=['payment_sequential', 'payment_value', 'payment_installments', 'payment_type'])
 
 # Impute missing product metrics with category means
-dim_cols = ['product_weight_g', 'product_length_cm', 'product_height_cm', 'product_width_cm']
-for col in dim_cols:
-    master_df[col] = master_df.groupby('product_category_name_english')[col].transform(lambda x: x.fillna(x.mean()))
+# Would have a bit of data leakge...
+# dim_cols = ['product_weight_g', 'product_length_cm', 'product_height_cm', 'product_width_cm']
+# for col in dim_cols:
+#     master_df[col] = master_df.groupby('product_category_name_english')[col].transform(lambda x: x.fillna(x.mean()))
 
+# meta_cols = ['product_name_length', 'product_desc_length', 'product_photos_qty']
+
+# for col in meta_cols:
+#     master_df[col] = master_df.groupby('product_category_name_english')[col].transform(lambda x: x.fillna(x.mean()))
+
+# Decided to drop instead... too much trouble and also not a big amount... still have way more than 10k instances...
+dim_cols = ['product_weight_g', 'product_length_cm', 'product_height_cm', 'product_width_cm'] 
 meta_cols = ['product_name_length', 'product_desc_length', 'product_photos_qty']
-
-for col in meta_cols:
-    master_df[col] = master_df.groupby('product_category_name_english')[col].transform(lambda x: x.fillna(x.mean()))
+master_df = master_df.dropna(subset=dim_cols)
+master_df = master_df.dropna(subset=meta_cols)
 
 # Match notebook's exact row duplicate dropping state
 master_df = master_df.drop_duplicates()
@@ -286,3 +293,4 @@ df['weight_x_distance'] = df['product_weight_g'] * df['geo_distance_km']
 
 # Save output
 df.to_csv('./Data/pre_split_features.csv', index=False)
+

@@ -5,6 +5,18 @@ import pandas as pd
 def _build_foldaware_features(train_df, apply_df):
     apply_df = apply_df.copy()
 
+    # moved from the cleaning part...
+    dim_cols = [
+        'product_weight_g', 'product_length_cm', 'product_height_cm', 'product_width_cm',
+        'product_name_length', 'product_desc_length', 'product_photos_qty'
+    ]  
+    for col in dim_cols:
+        apply_df[col] = apply_df.groupby('product_category_name_english')[col].transform(lambda x: x.fillna(x.mean()))
+
+    # Moved from the cleaning script too
+    int_cols = ['num_items', 'product_photos_qty', 'product_weight_g', 'product_length_cm', 'product_height_cm', 'product_width_cm', 'num_payment_methods', 'payment_installments', 'review_score', 'customer_zip_code_prefix', 'seller_zip_code_prefix', 'product_name_length', 'product_desc_length']
+    apply_df[int_cols] = apply_df[int_cols].astype(int)
+
     global_mean_freight = train_df["freight_to_price"].mean()
     global_install = train_df["payment_installments"].mean()
 
