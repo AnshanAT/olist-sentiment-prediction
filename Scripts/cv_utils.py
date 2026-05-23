@@ -77,20 +77,36 @@ def prepare_X_y(df, target_col):
     return X, y, feature_names#, median_giv
 
 
-
-
 def standardize_features(X_train, X_test):
     # z-score normalization based on training set stats only (to avoid data leakage)
+    # Detect binary features automatically (0/1 only)
+    binary_mask = np.all(
+        (X_train == 0) | (X_train == 1),
+        axis=0
+    )
+
     mean = X_train.mean(axis=0)
     std = X_train.std(axis=0)
 
     # avoid division by zero
     std[std == 0] = 1
 
-    X_train_scaled = (X_train - mean) / std
-    X_test_scaled = (X_test - mean) / std
+    X_train_scaled = X_train.copy()
+    X_test_scaled = X_test.copy()
+
+    # standardize non-binary features only
+    X_train_scaled[:, ~binary_mask] = (
+        X_train[:, ~binary_mask]
+        - mean[~binary_mask]
+    ) / std[~binary_mask]
+
+    X_test_scaled[:, ~binary_mask] = (
+        X_test[:, ~binary_mask]
+        - mean[~binary_mask]
+    ) / std[~binary_mask]
 
     return X_train_scaled, X_test_scaled
+
 
 def kfold_split(y, n_splits=10):
     

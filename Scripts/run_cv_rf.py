@@ -7,6 +7,8 @@ start_time = time.time()
 
 
 df = pd.read_csv("./Data/pre_split_features.csv")
+# dataset sampling for faster execution during development
+df = df.sample(n=4000,random_state=42).reset_index(drop=True)
 
 param_grid = {
     "max_depth": [5, 10, 20]

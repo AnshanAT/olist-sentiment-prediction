@@ -7,6 +7,8 @@ start_time = time.time()
 
 # load data
 df = pd.read_csv("./Data/pre_split_features.csv")
+# dataset sampling for faster execution during development
+df = df.sample(n=4000,random_state=42).reset_index(drop=True)
 
 param_grid = {
     "C": [0.01, 0.1, 1]
@@ -22,8 +24,8 @@ results = cross_validate(
 )
 
 # save results
-pd.DataFrame(results["fold_metrics"]).to_csv("./Results/fold_metrics.csv",index=False)
-pd.DataFrame(results["best_params"]).to_csv("./Results/best_params.csv",index=False)
+pd.DataFrame(results["fold_metrics"]).to_csv("./Results/fold_metrics_lr.csv",index=False)
+pd.DataFrame(results["best_params"]).to_csv("./Results/best_params_lr.csv",index=False)
 
 elapsed = time.time() - start_time
 
