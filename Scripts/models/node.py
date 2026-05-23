@@ -81,7 +81,11 @@ class NODEModel:
             lr=self.lr
         )
 
-        loss_fn = nn.CrossEntropyLoss()
+        class_counts = np.bincount(y_encoded)
+        class_weights = len(y_encoded) / (len(class_counts) * class_counts)
+        class_weights = torch.tensor(class_weights,dtype=torch.float32).to(self.device)
+
+        loss_fn = nn.CrossEntropyLoss(weight=class_weights)
 
         self.model.train()
 

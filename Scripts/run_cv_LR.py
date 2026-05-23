@@ -29,5 +29,6 @@ pd.DataFrame(results["best_params"]).to_csv("./Results/best_params_lr.csv",index
 
 elapsed = time.time() - start_time
 
+# print(df["review_score"].value_counts(normalize=True))
 print(f"\nDone")
 print(f"Execution time: {elapsed:.2f} sec")
