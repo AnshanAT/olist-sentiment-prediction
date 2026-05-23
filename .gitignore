@@ -6,3 +6,10 @@ data/*
 workloads.png
 Results/*
 Scripts\__pycache__/*
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Any nested __pycache__
+**/__pycache__/
