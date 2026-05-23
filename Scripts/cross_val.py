@@ -22,7 +22,7 @@ def evaluate_inner_fold(model_class, params, train_df, val_df, scoring):
     train_fe, val_fe = create_interaction_features(train_df, val_df)
 
     X_train, y_train, _, medians = prepare_X_y(train_fe, TARGET_COL)
-    X_val, y_val, _, _ = prepare_X_y(val_fe, TARGET_COL, median_giv = medians)
+    X_val, y_val, _, _ = prepare_X_y(val_fe, TARGET_COL)
 
     X_train, X_val = standardize_features(X_train, X_val)
 
@@ -72,7 +72,7 @@ def evaluate_outer_fold(model_class, params, train_df, test_df):
     train_fe, test_fe = create_interaction_features(train_df, test_df)
 
     X_train, y_train, feature_names, medians = prepare_X_y(train_fe, TARGET_COL)
-    X_test, y_test, _, _ = prepare_X_y(test_fe, TARGET_COL, median_giv=medians)
+    X_test, y_test, _, _ = prepare_X_y(test_fe, TARGET_COL)
 
     X_train, X_test = standardize_features(X_train, X_test)
 

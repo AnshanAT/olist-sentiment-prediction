@@ -32,7 +32,8 @@ DROP_COLS = [
     "photo_qty",
 ]
 
-def prepare_X_y(df, target_col, median_giv=None):
+# def prepare_X_y(df, target_col, median_giv=None):
+def prepare_X_y(df, target_col):
     data = df.copy()
 
     y = data[target_col].astype(int).values
@@ -50,29 +51,31 @@ def prepare_X_y(df, target_col, median_giv=None):
     ).columns
     data = data.drop(columns=bad_cols)
 
-    # Convert infinite values to NaN before
-    data = data.replace([np.inf, -np.inf], np.nan)
+    ### move to the create_interaction_features
+    # # Convert infinite values to NaN before
+    # data = data.replace([np.inf, -np.inf], np.nan)
     
-    # median not given so gotta calculate the means 
-    to_fit = False
-    if median_giv is None: to_fit = True
+    # # median not given so gotta calculate the means 
+    # to_fit = False
+    # if median_giv is None: to_fit = True
 
-    if to_fit:
-        median_giv = {}
+    # if to_fit:
+    #     median_giv = {}
 
-        # Just calculate for all cus key errors later...
-        for col in data.columns:
-            median_giv[col] = data[col].median()
+    #     # Just calculate for all cus key errors later...
+    #     for col in data.columns:
+    #         median_giv[col] = data[col].median()
     
-    # Median-impute remaining NaNs
-    for col in data.columns:
-        if data[col].isna().any():
-            data[col] = data[col].fillna(median_giv[col])
+    # # Median-impute remaining NaNs
+    # for col in data.columns:
+    #     if data[col].isna().any():
+    #         data[col] = data[col].fillna(median_giv[col])
 
     X = data.values.astype(np.float64)
     feature_names = data.columns.tolist()
 
-    return X, y, feature_names, median_giv
+    return X, y, feature_names#, median_giv
+
 
 
 

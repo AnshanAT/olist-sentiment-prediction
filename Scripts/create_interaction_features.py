@@ -10,8 +10,12 @@ def _build_foldaware_features(train_df, apply_df):
         'product_weight_g', 'product_length_cm', 'product_height_cm', 'product_width_cm',
         'product_name_length', 'product_desc_length', 'product_photos_qty'
     ]  
+
     for col in dim_cols:
-        apply_df[col] = apply_df.groupby('product_category_name_english')[col].transform(lambda x: x.fillna(x.mean()))
+        category_mean = train_df.groupby('product_category_name_english')[col].mean()
+        apply_df[col] = apply_df[col].fillna(apply_df['product_category_name_english'].map(category_mean))
+        apply_df[col] = apply_df[col].fillna(train_df[col].mean())
+        # apply_df[col] = apply_df.groupby('product_category_name_english')[col].transform(lambda x: x.fillna(x.mean()))
 
     # Moved from the cleaning script too
     int_cols = ['num_items', 'product_photos_qty', 'product_weight_g', 'product_length_cm', 'product_height_cm', 'product_width_cm', 'num_payment_methods', 'payment_installments', 'review_score', 'customer_zip_code_prefix', 'seller_zip_code_prefix', 'product_name_length', 'product_desc_length']
@@ -187,6 +191,16 @@ def _build_motif_indices(train_df, apply_df):
 
     return apply_df
 
+def _fill_missing_with_train_median(train_df, apply_df):
+    apply_df = apply_df.copy()
+
+    for col in apply_df.columns:
+        if apply_df[col].isna().any():
+            apply_df[col] = apply_df[col].fillna(
+                train_df[col].median()
+            )
+
+    return apply_df
 
 def create_interaction_features(train_df, test_df):
     """
@@ -204,5 +218,9 @@ def create_interaction_features(train_df, test_df):
 
     train_fe = _build_motif_indices(train_fe, train_fe)
     test_fe = _build_motif_indices(train_fe, test_fe)
+
+    # Fill remaining NaNs using train-fold medians only
+    train_fe = _fill_missing_with_train_median(train_fe, train_fe)
+    test_fe = _fill_missing_with_train_median(train_fe, test_fe)
 
     return train_fe, test_fe

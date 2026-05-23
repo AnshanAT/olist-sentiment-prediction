@@ -254,7 +254,7 @@ df['purchase_dow'] = df['order_purchase_timestamp'].dt.dayofweek
 df['purchase_month'] = df['order_purchase_timestamp'].dt.month
 df['purchase_quarter'] = df['order_purchase_timestamp'].dt.quarter
 df['is_weekend'] = (df['purchase_dow'] >= 5).astype(int)
-df['is_night'] = (df['purchase_hour'].between(22, 5)).astype(int)
+df['is_night'] = ((df['purchase_hour'] >= 22)|(df['purchase_hour'] <=5)).astype(int)
 
 # Geographics
 df['same_state'] = (df['customer_state'].astype(str) == df['seller_state'].astype(str)).astype(int)
