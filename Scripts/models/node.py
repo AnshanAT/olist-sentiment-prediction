@@ -9,11 +9,11 @@ from models.node_lib.arch import DenseBlock
 class NODEModel:
     def __init__(
         self,
-        num_layers=2,
+        num_layers=4,
         layer_dim=128,
         depth=6,
-        tree_dim=1,
-        epochs=20,
+        tree_dim=2,
+        epochs=50,
         batch_size=512,
         lr=0.001
     ):

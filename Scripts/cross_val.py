@@ -18,8 +18,11 @@ def score_result(y_true, y_pred, scoring):
     raise ValueError(f"Unknown scoring: {scoring}")
 
 
-def evaluate_inner_fold(model_class, params, train_df, val_df, scoring):
-    train_fe, val_fe = create_interaction_features(train_df, val_df)
+def evaluate_inner_fold(model_class, params, train_df, val_df, scoring, use_interactions=True):
+    if use_interactions:
+        train_fe, val_fe = create_interaction_features(train_df, val_df)
+    else:
+        train_fe, val_fe = train_df, val_df
 
     X_train, y_train, _ = prepare_X_y(train_fe, TARGET_COL)
     X_val, y_val, _ = prepare_X_y(val_fe, TARGET_COL)
@@ -34,7 +37,7 @@ def evaluate_inner_fold(model_class, params, train_df, val_df, scoring):
     return score_result(y_val, y_pred, scoring)
 
 
-def select_best_params(model_class, train_df, param_grid, n_inner=3, scoring="f1_macro"):
+def select_best_params(model_class, train_df, param_grid, n_inner=3, scoring="f1_macro", use_interactions=True):
     y = train_df[TARGET_COL].astype(int).values
 
     param_list = make_param_grid(param_grid)
@@ -54,7 +57,8 @@ def select_best_params(model_class, train_df, param_grid, n_inner=3, scoring="f1
                 params,
                 inner_train_df,
                 val_df,
-                scoring
+                scoring,
+                use_interactions
             )
 
             scores.append(score)
@@ -68,8 +72,11 @@ def select_best_params(model_class, train_df, param_grid, n_inner=3, scoring="f1
     return best_params, best_score
 
 
-def evaluate_outer_fold(model_class, params, train_df, test_df):
-    train_fe, test_fe = create_interaction_features(train_df, test_df)
+def evaluate_outer_fold(model_class, params, train_df, test_df, use_interactions=True):
+    if use_interactions:
+        train_fe, test_fe = create_interaction_features(train_df, test_df)
+    else:
+        train_fe, test_fe = train_df, test_df
 
     X_train, y_train, feature_names = prepare_X_y(train_fe, TARGET_COL)
     X_test, y_test, _= prepare_X_y(test_fe, TARGET_COL)
@@ -93,7 +100,8 @@ def cross_validate(
     n_outer=10,
     n_inner=3,
     scoring="f1_macro",
-    verbose=True
+    verbose=True,
+    use_interactions=True
 ):
     y = df[TARGET_COL].astype(int).values
 
@@ -115,14 +123,16 @@ def cross_validate(
             train_df=train_df,
             param_grid=param_grid,
             n_inner=n_inner,
-            scoring=scoring
+            scoring=scoring,
+            use_interactions=use_interactions
         )
 
         metrics, y_test, y_pred, feature_names = evaluate_outer_fold(
             model_class=model_class,
             params=best_params,
             train_df=train_df,
-            test_df=test_df
+            test_df=test_df,
+            use_interactions=use_interactions
         )
 
         fold_metrics.append(metrics)

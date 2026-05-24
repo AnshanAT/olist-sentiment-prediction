@@ -118,11 +118,11 @@ def mae(y_true, y_pred):
 def compute_all_metrics(y_true, y_pred, y_proba=None):
     return {
         "accuracy": accuracy(y_true, y_pred),
-        "error_rate": error_rate(y_true, y_pred),
+        # "error_rate": error_rate(y_true, y_pred),
         "precision_macro": precision_macro(y_true, y_pred),
         "recall_macro": recall_macro(y_true, y_pred),
-        "specificity_macro": specificity_macro(y_true, y_pred),
+        # "specificity_macro": specificity_macro(y_true, y_pred),
         "f1_macro": f1_macro(y_true, y_pred),
-        "rmse": rmse(y_true, y_pred),
-        "mae": mae(y_true, y_pred),
+        # "rmse": rmse(y_true, y_pred),
+        # "mae": mae(y_true, y_pred),
     }

@@ -225,6 +225,9 @@ df['price_per_item'] = df[price_col] / df[items_col].clip(lower=1)
 df['freight_per_item'] = df[freight_col] / df[items_col].clip(lower=1)
 
 # Calculate payment metrics
+# remove invalid installment rows
+df = df[df["payment_installments"] > 0].copy()
+
 df['value_per_installment'] = np.where(df['payment_installments'] > 0, df['payment_value'] / df['payment_installments'], np.nan)
 methods_col = 'num_payment_methods' if 'num_payment_methods' in df.columns else 'payment_sequential'
 df['multi_payment'] = (df[methods_col] > 1).astype(int)
@@ -290,6 +293,44 @@ df['installment_burden'] = df['payment_installments'] * df['payment_value']
 df['delay_per_estimated_day'] = df['delivery_delay_days'] / df['estimated_wait_days'].clip(lower=1)
 # Heavy parcel + long distance = highest shipping risk composite
 df['weight_x_distance'] = df['product_weight_g'] * df['geo_distance_km']
+
+
+# Final sanity checks before saving
+print("\nFinal dataset shape:")
+print(df.shape)
+
+# Check missing values
+na_counts = df.isna().sum()
+na_counts = na_counts[na_counts > 0]
+
+print("\nColumns with NaN values:")
+if len(na_counts) == 0:
+    print("No NaN values found.")
+else:
+    print(na_counts.sort_values(ascending=False))
+
+# Check infinite values in numeric columns
+numeric_cols = df.select_dtypes(include=[np.number]).columns
+inf_counts = np.isinf(df[numeric_cols]).sum()
+inf_counts = inf_counts[inf_counts > 0]
+
+print("\nColumns with inf/-inf values:")
+if len(inf_counts) == 0:
+    print("No inf/-inf values found.")
+else:
+    print(inf_counts.sort_values(ascending=False))
+
+# Check non-numeric columns
+non_numeric_cols = df.select_dtypes(
+    exclude=[np.number]
+).columns.tolist()
+
+print("\nNon-numeric columns:")
+if len(non_numeric_cols) == 0:
+    print("No non-numeric columns found.")
+else:
+    print(non_numeric_cols)
+
 
 # Save output
 df.to_csv('./Data/pre_split_features.csv', index=False)
