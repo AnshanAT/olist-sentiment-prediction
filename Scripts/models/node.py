@@ -4,7 +4,7 @@ from torch import nn
 from torch.optim import Adam
 from torch.utils.data import DataLoader, TensorDataset
 from models.node_lib.arch import DenseBlock
-
+import warnings
 
 class NODEModel:
     def __init__(
@@ -66,8 +66,14 @@ class NODEModel:
         init_size = min(1000, len(X))
         dense.to(self.device)
         dense.eval()
-        with torch.no_grad():
-            dense(X[:init_size].to(self.device))
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message="Data-aware initialization is performed on less than 1000 data points.*"
+            )
+            with torch.no_grad():
+                dense(X[:init_size].to(self.device))
         dense.train()
 
         loader = DataLoader(

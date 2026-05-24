@@ -24,7 +24,6 @@ param_grid = {
 # }
 
 print("\n=== Base engineered features ===")
-print("before cv")
 results = cross_validate(
     model_class=NODEModel,
     df=df,
@@ -34,7 +33,6 @@ results = cross_validate(
     scoring="f1_macro",
     use_interactions=False
 )
-print("after cv")
 
 print("\n=== Enhanced behavioural features ===")
 results_enhanced = cross_validate(

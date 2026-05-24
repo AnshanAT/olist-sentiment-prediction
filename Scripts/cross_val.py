@@ -31,9 +31,7 @@ def evaluate_inner_fold(model_class, params, train_df, val_df, scoring, use_inte
     X_train, X_val = standardize_features(X_train, X_val)
 
     model = model_class(**params)
-    print("before model fit")
     model.fit(X_train, y_train)
-    print("after model fit")
 
     y_pred = model.predict(X_val)
 
@@ -119,7 +117,7 @@ def cross_validate(
     y_true_all = []
     y_pred_all = []
     feature_names = None
-    print("cv start")
+
     for fold, (train_idx, test_idx) in enumerate(
         kfold_split(y, n_splits=n_outer),
         start=1

@@ -3,6 +3,9 @@ data/*
 # __pycache__/
 # *.pyc
 # .ipynb_checkpoints/
+!Data/pre_split_features.csv
+
+
 workloads.png
 Results/*
 Scripts\__pycache__/*
@@ -13,3 +16,4 @@ __pycache__/
 
 # Any nested __pycache__
 **/__pycache__/
+
