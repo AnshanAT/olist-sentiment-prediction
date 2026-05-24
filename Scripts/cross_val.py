@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn import metrics
 
 from cv_utils import kfold_split, make_param_grid, prepare_X_y, standardize_features
 from create_interaction_features import create_interaction_features
@@ -30,7 +31,9 @@ def evaluate_inner_fold(model_class, params, train_df, val_df, scoring, use_inte
     X_train, X_val = standardize_features(X_train, X_val)
 
     model = model_class(**params)
+    print("before model fit")
     model.fit(X_train, y_train)
+    print("after model fit")
 
     y_pred = model.predict(X_val)
 
@@ -87,8 +90,14 @@ def evaluate_outer_fold(model_class, params, train_df, test_df, use_interactions
     model.fit(X_train, y_train)
 
     y_pred = model.predict(X_test)
+    y_train_pred = model.predict(X_train)
 
     metrics = compute_all_metrics(y_test, y_pred)
+    train_metrics = compute_all_metrics(y_train, y_train_pred)
+    train_test_gap = (train_metrics["f1_macro"]- metrics["f1_macro"])
+    
+    metrics["train_f1"] = train_metrics["f1_macro"]
+    metrics["train_test_gap"] = train_test_gap
 
     return metrics, y_test, y_pred, feature_names
 
@@ -110,7 +119,7 @@ def cross_validate(
     y_true_all = []
     y_pred_all = []
     feature_names = None
-
+    print("cv start")
     for fold, (train_idx, test_idx) in enumerate(
         kfold_split(y, n_splits=n_outer),
         start=1

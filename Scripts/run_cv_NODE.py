@@ -8,11 +8,11 @@ start_time = time.time()
 # load data
 df = pd.read_csv("./Data/pre_split_features.csv")
 # dataset sampling for faster execution during development
-df = df.sample(n=4000,random_state=42).reset_index(drop=True)
+df = df.sample(n=1000,random_state=42).reset_index(drop=True)
 
 
 param_grid = {
-    "num_layers": [4],
+    "num_layers": [2],
     "depth": [4, 6],
     "tree_dim": [2]
 }
@@ -24,6 +24,7 @@ param_grid = {
 # }
 
 print("\n=== Base engineered features ===")
+print("before cv")
 results = cross_validate(
     model_class=NODEModel,
     df=df,
@@ -33,6 +34,7 @@ results = cross_validate(
     scoring="f1_macro",
     use_interactions=False
 )
+print("after cv")
 
 print("\n=== Enhanced behavioural features ===")
 results_enhanced = cross_validate(
