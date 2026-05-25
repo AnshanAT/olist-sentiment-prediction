@@ -282,7 +282,7 @@ df = pd.concat([df, cust_dummies, sell_dummies], axis=1)
 df = df.drop(columns=['customer_region', 'seller_region'])
 
 # Composite interaction features
-# Late AND expensive shipping — double-bad signal
+# Late and expensive shipping — double-bad signal
 df['delay_x_freight_ratio'] = df['delivery_delay_days'] * df['freight_to_price']
 # Complex multi-item orders put more pressure on processing
 items_col = 'num_items' if 'num_items' in df.columns else 'order_item_id'
@@ -294,6 +294,12 @@ df['delay_per_estimated_day'] = df['delivery_delay_days'] / df['estimated_wait_d
 # Heavy parcel + long distance = highest shipping risk composite
 df['weight_x_distance'] = df['product_weight_g'] * df['geo_distance_km']
 
+
+# Distance-to-estimated-wait ratio
+df['distance_per_estimated_day'] = df['geo_distance_km'] / df['estimated_wait_days'].clip(lower=0.01)
+
+#  Order complexity score --> if a lot of orders...
+df['order_complexity'] = df['num_items'] * df['num_payment_methods']
 
 # Final sanity checks before saving
 print("\nFinal dataset shape:")

@@ -3,7 +3,7 @@ import torch
 from torch import nn
 from torch.optim import Adam
 from torch.utils.data import DataLoader, TensorDataset
-from models.node_lib.arch import DenseBlock
+from Scripts.models.node_lib.arch import DenseBlock
 import warnings
 
 class NODEModel:

@@ -1,6 +1,6 @@
 import time
 import pandas as pd
-from cross_val import cross_validate
+from Scripts.corss_validation.cross_val import cross_validate
 from models.random_forest import RandomForestModel
 
 start_time = time.time()

@@ -1,6 +1,6 @@
 import time
 import pandas as pd
-from cross_val import cross_validate
+from Scripts.corss_validation.cross_val import cross_validate
 from models.logistic_regression import LogisticRegressionModel
 
 start_time = time.time()

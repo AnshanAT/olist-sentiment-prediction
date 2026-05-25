@@ -1,13 +1,11 @@
 import numpy as np
 from sklearn import metrics
 
-from cv_utils import kfold_split, make_param_grid, prepare_X_y, standardize_features
-from create_interaction_features import create_interaction_features
-from metrics import compute_all_metrics, f1_macro, accuracy
-
+from Scripts.corss_validation.cv_utils import kfold_split, make_param_grid, prepare_X_y, standardize_features
+from Scripts.feature_engineering.create_interaction_features import create_interaction_features
+from Scripts.corss_validation.metrics import compute_all_metrics, f1_macro, accuracy
 
 TARGET_COL = "review_score"
-
 
 def score_result(y_true, y_pred, scoring):
     if scoring == "f1_macro":
@@ -111,6 +109,13 @@ def cross_validate(
     use_interactions=True
 ):
     y = df[TARGET_COL].astype(int).values
+
+    if verbose:
+        preview_df = df.copy()
+        if use_interactions:
+            preview_df, _ = create_interaction_features(preview_df, preview_df)
+        X_preview, _, _ = prepare_X_y(preview_df, TARGET_COL)
+        print(f"Samples: {X_preview.shape[0]}, Features: {X_preview.shape[1]}")
 
     fold_metrics = []
     best_params_all = []

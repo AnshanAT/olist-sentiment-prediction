@@ -142,6 +142,18 @@ def _build_foldaware_features(train_df, apply_df):
         apply_df["customer_order_count"] > 1
     ).astype(int)
 
+    # Delivery speed relative to category norm 
+    apply_df['delay_vs_category_avg'] = apply_df['delivery_delay_days'] - apply_df['category_avg_delay']
+
+    # Freight anomaly compared to the category 
+    apply_df['freight_vs_category_avg'] = apply_df['freight_to_price'] - apply_df['category_avg_freight']
+
+    # not reliable seller who also late...
+    apply_df['seller_unreliability_x_delay'] = (1 - apply_df['seller_on_time_rate']) * apply_df['delivery_delay_days'].clip(lower=0)
+    
+    # how much of processing was seller...
+    apply_df['processing_vs_seller_avg'] = apply_df['processing_time_hrs'] - apply_df['seller_avg_processing_hrs']
+    
     return apply_df
 
 
