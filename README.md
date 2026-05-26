@@ -27,3 +27,7 @@ We will compare three models with different levels of complexity
 3.	Neural Oblivious Decision Ensembles (NODE, ICLR 2020) as a complex model
 
 We will evaluate whether motif-based engineered features improve prediction performance compared to raw transactional features, and whether complex models such as NODE better capture non-linear interactions between these behavioural motifs.
+
+### AI Statement
+LLMs were used to help explain and resolve bugs that were encountered during the development of the pipeline. Eg. Data leakage logic errors. 
+All core logic approaches and implementation decisions were decided and validated by us. The LLM was used primarily as a reference and debugging aid rather than a code generator.
