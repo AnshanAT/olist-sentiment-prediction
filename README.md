@@ -1,4 +1,4 @@
-# olist-sentiment-prediction
+# Olist-sentiment-prediction
 Repository for COMP90051 Project, Group 55
 
 
@@ -7,27 +7,76 @@ Repository for COMP90051 Project, Group 55
 pip install -r requirements.txt
 ```
 
-# Research Queston
+# Research Question
 To what extent can customer review sentiment be inferred from structured behavioural and transactional signals—such as order timing, payment behaviour, freight ratios, and product diversity—without using any textual review information?
 
 # Dataset
 We plan to use the Olist Brazilian E-commerce dataset, which consists of multiple relational tables (orders, payments, products, customers, and reviews).
 https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce/data 
 
-# Feature Engineering
-To address the research question, we propose to design structured behavioural features that capture latent customer states, rather than relying on raw variables.
-1.	A frustration index, defined as the normalized difference between estimated and actual delivery time, along with freight-to-price ratios
-2.	A financial burden index, based on the relationship between total payment value and the number of installments
-3.	A consistency index, capturing variability in customer purchasing behaviour, such as product category diversity and price dispersion
-
 # Experimental Design
-We will compare three models with different levels of complexity
-1.	Logistic Regression as a simple baseline
-2.	Random Forest as a medium-complexity model
-3.	Neural Oblivious Decision Ensembles (NODE, ICLR 2020) as a complex model
 
-We will evaluate whether motif-based engineered features improve prediction performance compared to raw transactional features, and whether complex models such as NODE better capture non-linear interactions between these behavioural motifs.
+Three models with different complexity levels were compared:
 
-### AI Statement
-LLMs were used to help explain and resolve bugs that were encountered during the development of the pipeline. Eg. Data leakage logic errors. 
-All core logic approaches and implementation decisions were decided and validated by us. The LLM was used primarily as a reference and debugging aid rather than a code generator.
+1. Logistic Regression (low complexity)
+2. Random Forest (medium complexity)
+3. Neural Oblivious Decision Ensembles (NODE, ICLR 2020) (high complexity)
+
+Nested cross-validation with hyperparameter tuning was implemented from scratch to compare model performance.
+
+
+# Feature Engineering
+
+Feature engineering was performed in two stages:
+
+1. Pre-split features:
+   - Temporal and delivery features
+   - Freight and pricing features
+   - Product-related features
+
+2. Behavioural representation features:
+   - Frustration index
+   - Financial burden index
+   - Consistency index
+
+# Folder Structure
+- **Data/**
+  - Raw dataset files
+- **Notebooks/**
+  - **feature_engineering/**
+    - Data cleaning, joining, and feature creation notebooks
+  - **runs/**
+    - Run nested cross-validation notebooks
+- **Scripts/**
+  - **cross_validation/**
+    - Nested cross-validation implementation
+  - **feature_engineering/**
+    - Feature generation scripts
+  - **models/**
+    - Model class definitions and wrappers
+    - **node_lib/**
+      - Core NODE architecture and related modules
+
+- **Results/**
+  - Saved metrics and generated figures
+
+# How to Run
+
+1. Place the Olist dataset files inside the **Data/** folder.
+
+2. Run feature generation scripts:
+
+   **Scripts/feature_engineering/**
+   - `create_pre_split_features.py`
+
+3. Run the model notebooks:
+
+   **Notebooks/runs/**
+   - `run_cv_LR.ipynb`
+   - `run_cv_RF.ipynb`
+   - `run_cv_NODE.ipynb`
+
+4. Generated metrics and figures will be saved in:
+
+   **Results/**
+
